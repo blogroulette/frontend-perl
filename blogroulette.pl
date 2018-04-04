@@ -2,6 +2,8 @@
 use LWP::UserAgent;
 use JSON::MaybeXS qw(encode_json decode_json);
 
+binmode(STDOUT, ":utf8");
+
 my $ua = LWP::UserAgent->new;
  
 my $server_endpoint = "http://localhost:8080/blogroulette-jee/";
@@ -27,7 +29,7 @@ if($ARGV[0] eq ""){
 }elsif($ARGV[0] eq "votecomment"){
 	if(scalar @ARGV != 4){&error();}
 	$endpoint ="VoteComment";
-	$post_data = '{"commentid":"'.$ARGV[1].'","messageid":"'.$ARGV[2].'","vote":"'.$ARGV[3].'"}';
+	$post_data = '{"commentid":"'.$ARGV[2].'","messageid":"'.$ARGV[1].'","vote":"'.$ARGV[3].'"}';
 }
 else {
 	&error();
@@ -75,7 +77,7 @@ sub error {
 	"write [title] [text] \n\tWrite a Message\n",
 	"comment [Message-Id] [text]\n\tComment to a Message\n",
 	"vote [Message-Id] up|down\n\tVote to a Message\n",
-	"votecomment [Comment-Id] [Message-Id] up|down\n\tVote to a Comment\n",
+	"votecomment [Message-Id] [Comment-Id] up|down\n\tVote to a Comment\n",
 	"doc\n\tGetDocumentation\n";
 	exit 0;
 }
