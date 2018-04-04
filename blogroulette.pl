@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use LWP::UserAgent;
+use JSON::MaybeXS qw(encode_json decode_json);
 
 my $ua = LWP::UserAgent->new;
  
@@ -30,11 +31,33 @@ $req->content($post_data);
 my $resp = $ua->request($req);
 if ($resp->is_success) {
     my $message = $resp->decoded_content;
-    print "Received reply: $message\n";
+    &print_message( $message );
 }
 else {
     print "HTTP POST error code: ", $resp->code, "\n";
     print "HTTP POST error message: ", $resp->message, "\n";
+}
+
+sub print_message {
+	my $message = decode_json $_[0];
+	if(!$message->{status} eq ""){
+		print $message->{status},"\n";
+		if(!$message->{error} eq ""){
+	                print $message->{error},"\n";
+        	}
+		return;
+	}
+	print $message->{messageid},": ",
+	$message->{title}, "\n",
+	"\tVotes: ",$message->{votes},"\n",,
+	"------------------------------------\n",
+	$message->{text},"\n",
+	"------------------------------------\n";
+	foreach $com (@{$message->{comments}}){
+		print "\t",$com->{text},
+		"\n\t\tVotes: ",$com->{votes},"\n",
+		"\t----------------------------\n";
+	}
 }
 
 sub error {
