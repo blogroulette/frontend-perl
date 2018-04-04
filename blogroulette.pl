@@ -20,6 +20,10 @@ if($ARGV[0] eq ""){
 	if(scalar @ARGV != 3){&error();}
 	$endpoint ="AddComment";
 	$post_data = '{"messageid":"'.$ARGV[1].'","text":"'.$ARGV[2].'"}';
+}elsif($ARGV[0] eq "vote"){
+	if(scalar @ARGV != 3){&error();}
+	$endpoint ="VoteMessage";
+	$post_data = '{"messageid":"'.$ARGV[1].'","vote":"'.$ARGV[2].'"}';
 }
 else {
 	&error();
@@ -66,6 +70,7 @@ sub error {
 	print "Available Commands: \n",
 	"write [title] [text] \n\tWrite a Message\n",
 	"comment [Message-Id] [text]\n\tComment to a Message\n",
+	"vote [Message-Id] up|down\n\tVote to a Message\n",
 	"doc\n\tGetDocumentation\n";
 	exit 0;
 }
