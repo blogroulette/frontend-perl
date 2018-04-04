@@ -10,6 +10,8 @@ my $post_data = '';
 
 if($ARGV[0] eq ""){
 	
+}elsif($ARGV[0] eq "doc"){
+	$post_data='{"messageid":"0"}';
 }elsif($ARGV[0] eq "write"){
 	if(scalar @ARGV != 3){&error();}
 	$endpoint ="AddMessage";
@@ -62,7 +64,8 @@ sub print_message {
 
 sub error {
 	print "Available Commands: \n",
-	"write [title] [text]\n",
-	"comment [Message-Id] [text]\n";
+	"write [title] [text] \n\tWrite a Message\n",
+	"comment [Message-Id] [text]\n\tComment to a Message\n",
+	"doc\n\tGetDocumentation\n";
 	exit 0;
 }
