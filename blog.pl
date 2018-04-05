@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use LWP::UserAgent;
 use JSON::MaybeXS qw(encode_json decode_json);
+use IO::Prompter;
+use Term::ReadKey;
 
 binmode(STDOUT, ":utf8");
 
@@ -9,6 +11,13 @@ my $ua = LWP::UserAgent->new;
 my $server_endpoint = "http://localhost:8080/blogroulette-jee/";
 my $endpoint = "GetMessage";
 my $post_data = '';
+my $token='';
+if (open(my $fh, '<:encoding(UTF-8)', '.token')) {
+  while (my $row = <$fh>) {
+    chomp $row;
+    $token=$row;
+  }
+}
 
 if($ARGV[0] eq ""){
 	
@@ -30,14 +39,35 @@ if($ARGV[0] eq ""){
 	if(scalar @ARGV != 4){&error();}
 	$endpoint ="VoteComment";
 	$post_data = '{"commentid":"'.$ARGV[2].'","messageid":"'.$ARGV[1].'","vote":"'.$ARGV[3].'"}';
-}
-else {
+}elsif($ARGV[0] eq "login"){
+	$endpoint="Login";
+	my $name = $ARGV[1];
+	undef @ARGV;
+	my $password = prompt 'Password', -echo=>'*';
+	$post_data = '{"username":"'.$name.'","password":"'.$password.'"}';
+}elsif($ARGV[0] eq "logout"){
+	$endpoint="Logout";
+	unlink ".token";
+}elsif($ARGV[0] eq "register"){
+	$endpoint="Register";
+	my $p1="p1";
+	my $p2="p2";
+	my $name = $ARGV[1];
+	undef @ARGV;
+	do{
+		$p1 = prompt 'Password:', -echo => '*';
+		$p2 = prompt 'Repeat Password:', -echo => '*';
+		print "p1: ",$p1," p2: ",$p2, $p1 eq $p2,"\n";
+	}while(!$p1 eq $p2);
+	$post_data = '{"username":"'.$name.'","password":"'.$p1.'"}';
+}else {
 	&error();
 }
 
 # set custom HTTP request header fields
 my $req = HTTP::Request->new(POST => ${server_endpoint}.${endpoint});
 $req->header('content-type' => 'application/json');
+$req->header('Authorization' => $token);
 $req->content($post_data);
  
 my $resp = $ua->request($req);
@@ -52,6 +82,13 @@ else {
 
 sub print_message {
 	my $message = decode_json $_[0];
+	if(!$message->{token} eq ""){
+		open(my $fh, '>', '.token');
+		print $fh $message->{token};
+		close $fh;
+		print "ok\n";
+		return;
+	}
 	if(!$message->{status} eq ""){
 		print $message->{status},"\n";
 		if(!$message->{error} eq ""){
@@ -78,6 +115,9 @@ sub error {
 	"comment [Message-Id] [text]\n\tComment to a Message\n",
 	"vote [Message-Id] up|down\n\tVote to a Message\n",
 	"votecomment [Message-Id] [Comment-Id] up|down\n\tVote to a Comment\n",
+	"login [username]\n\tLog in to Comment\n",
+	"logout \n\tLogout\n",
+	"register [username] \n\tRegister a new User\n",
 	"doc\n\tGetDocumentation\n";
 	exit 0;
 }
