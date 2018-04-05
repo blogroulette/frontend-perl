@@ -42,12 +42,12 @@ $req->content($post_data);
  
 my $resp = $ua->request($req);
 if ($resp->is_success) {
-    my $message = $resp->decoded_content;
-    &print_message( $message );
+	my $message = $resp->decoded_content;
+	&print_message( $message );
 }
 else {
-    print "HTTP POST error code: ", $resp->code, "\n";
-    print "HTTP POST error message: ", $resp->message, "\n";
+	print "HTTP POST error code: ", $resp->code, "\n";
+	print "HTTP POST error message: ", $resp->message, "\n";
 }
 
 sub print_message {
