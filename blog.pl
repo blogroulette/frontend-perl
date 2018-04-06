@@ -57,7 +57,6 @@ if($ARGV[0] eq ""){
 	do{
 		$p1 = prompt 'Password:', -echo => '*';
 		$p2 = prompt 'Repeat Password:', -echo => '*';
-		print "p1: ",$p1," p2: ",$p2, $p1 eq $p2,"\n";
 	}while(!$p1 eq $p2);
 	$post_data = '{"username":"'.$name.'","password":"'.$p1.'"}';
 }else {
